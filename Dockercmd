@@ -1,0 +1,280 @@
+###############DOCKER############
+docker run hello-world
+docker ps  ###to list running containers
+docker ps -a ##all the containers
+docker images
+docker run --name web01 -d -p 9080:80 nginx  ####-d it will run in backgraoud -p for ports
+docker inspect #for container info and to see the ip
+curl http://ip
+docker stop container name
+docker rm container name
+vim dockerfile
+docker build -t -P imagename
+
+
+
+To give permission to ubunutu
+ubuntu@ip-172-31-31-3:~$ docker images
+permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock: Get "http://%2Fvar%2Frun%2Fdocker.sock/v1.24/images/json": dial unix /var/run/docker.sock: connect: permission denied
+ubuntu@ip-172-31-31-3:~$ sudo usermod -aG docker ubuntu
+ubuntu@ip-172-31-31-3:~$ id ubuntu
+uid=1000(ubuntu) gid=1000(ubuntu) groups=1000(ubuntu),4(adm),20(dialout),24(cdrom),25(floppy),27(sudo),29(audio),30(dip),44(video),46(plugdev),118(netdev),119(lxd),998(docker)
+ubuntu@ip-172-31-31-3:~$
+
+
+#################Docker commands ######################
+images you will find in dockerhub
+docker registery conatain images
+from images you can run containers
+docker pull nginx
+docker run --name myweb -p 7090:80 -d nginx     ###to run a container on private n/w by a name       ##### d means it will run in the detached mode in background
+ docker run --name myweb -d -P nginx    ######for automatically it will pick up the host port
+ nginx use port 80 so if you want to let external user connect it priavtely
+ it will make it a private n/w
+ you cant access it so if you want to access it externally you have to connect it by port and then it will let nginx know
+ port mapping 8080:80 host port:container port
+ Port mapping, also known as port forwarding, is a technique used in networking to allow external devices or users to access services on a private network
+ docker stop conatainer id/name
+docker start conatainer id/name
+
+#container is just a process running from directory
+proof
+ubuntu      4700       1  0 12:37 ?        00:00:00 /lib/systemd/systemd --user
+ubuntu      4701    4700  0 12:37 ?        00:00:00 (sd-pam)
+ubuntu      4775    4697  0 12:37 ?        00:00:00 sshd: ubuntu@pts/0
+ubuntu      4776    4775  0 12:37 pts/0    00:00:00 -bash
+root        4797       2  0 12:38 ?        00:00:00 [kworker/0:0]
+root        4821    3211  0 12:38 ?        00:00:00 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 7090 -container-ip 172.17.0.2 -container-port 80
+root        4826    3211  0 12:38 ?        00:00:00 /usr/bin/docker-proxy -proto tcp -host-ip :: -host-port 7090 -container-ip 172.17.0.2 -container-port 80
+root        4842       1  0 12:38 ?        00:00:00 /usr/bin/containerd-shim-runc-v2 -namespace moby -id ee2933befd6e2adaba2d80a0976994bb512ba56a167be89108b54efece61e9cb -address /run/containe
+root        4862    4842  0 12:38 ?        00:00:00 nginx: master process nginx -g daemon off;
+systemd+    4908    4862  0 12:38 ?        00:00:00 nginx: worker process
+ubuntu      4955    4776  0 12:43 pts/0    00:00:00 ps -ef
+ 
+cd /var/lib/docker/containers 
+you will see the container by their names
+ubuntu@ip-172-31-31-3:~$ sudo -i
+root@ip-172-31-31-3:~# cd /var/lib/docker/
+root@ip-172-31-31-3:/var/lib/docker# ls
+buildkit  containers  engine-id  image  network  overlay2  plugins  runtimes  swarm  tmp  volumes
+root@ip-172-31-31-3:/var/lib/docker# cd containers/
+root@ip-172-31-31-3:/var/lib/docker/containers# ls
+b69e8c14584455fad852b08f870674a6aca71bbc56776ae661aa8f6f913ff4db  ee2933befd6e2adaba2d80a0976994bb512ba56a167be89108b54efece61e9cb
+root@ip-172-31-31-3:/var/lib/docker/containers# cd ee2933befd6e2adaba2d80a0976994bb512ba56a167be89108b54efece61e9cb/
+root@ip-172-31-31-3:/var/lib/docker/containers/ee2933befd6e2adaba2d80a0976994bb512ba56a167be89108b54efece61e9cb# ls
+checkpoints  config.v2.json  ee2933befd6e2adaba2d80a0976994bb512ba56a167be89108b54efece61e9cb-json.log  hostconfig.json  hostname  hosts  mounts  resolv.conf  resolv.conf.hash
+root@ip-172-31-31-3:/var/lib/docker/containers/ee2933befd6e2adaba2d80a0976994bb512ba56a167be89108b54efece61e9cb#
+All the data coming from the images
+and container size is very less
+root@ip-172-31-31-3:/var/lib/docker/containers# du -sh
+84K
+
+#######IF YOU WANT TO RU COMMAND ON CONATINER NOW HOW YOU DO IT BEACUSE IT JUST A PROCESS
+docker exec conatainer name command
+ubuntu@ip-172-31-31-3:~$ docker exec myweb ls
+now you want to run the command and attach to the container how you do it
+docker exec -it myweb /bin/bash    ####-it to attach to the conatiner
+ubuntu@ip-172-31-31-3:~$ docker exec -it myweb /bin/bash
+root@ee2933befd6e:/#
+to see the processes -ps -ef 
+
+
+########to remove images
+first stop the container
+remove the container
+then remove the image
+ubuntu@ip-172-31-31-3:~$ docker ps
+CONTAINER ID   IMAGE     COMMAND                  CREATED          STATUS          PORTS                                   NAMES
+ee2933befd6e   nginx     "/docker-entrypoint.…"   16 minutes ago   Up 16 minutes   0.0.0.0:7090->80/tcp, :::7090->80/tcp   myweb
+ubuntu@ip-172-31-31-3:~$ docker ps -a
+CONTAINER ID   IMAGE         COMMAND                  CREATED          STATUS                      PORTS                                   NAMES
+ee2933befd6e   nginx         "/docker-entrypoint.…"   16 minutes ago   Up 16 minutes               0.0.0.0:7090->80/tcp, :::7090->80/tcp   myweb
+b69e8c145844   hello-world   "/hello"                 37 minutes ago   Exited (0) 37 minutes ago                                           relaxed_meninsky
+ubuntu@ip-172-31-31-3:~$ docker stop ee2933befd6e
+ee2933befd6e
+ubuntu@ip-172-31-31-3:~$ docker rm ee2933befd6e
+ee2933befd6e
+ubuntu@ip-172-31-31-3:~$ docker images
+REPOSITORY    TAG       IMAGE ID       CREATED        SIZE
+nginx         latest    d453dd892d93   2 months ago   187MB
+hello-world   latest    d2c94e258dcb   7 months ago   13.3kB
+ubuntu@ip-172-31-31-3:~$ docker rmi nginx
+Untagged: nginx:latest
+Untagged: nginx@sha256:2bdc49f2f8ae8d8dc50ed00f2ee56d00385c6f8bc8a8b320d0a294d9e3b49026
+Deleted: sha256:d453dd892d9357f3559b967478ae9cbc417b52de66b53142f6c16c8a275486b9
+Deleted: sha256:efa10324a701d6accf82a523dcaba9aadf21943e214a8879d10c13284bffcd5f
+Deleted: sha256:4178f7184379d32ddc77d881dca384ac307dedb0c42f521fe633c5a95f308cd6
+Deleted: sha256:454122e697d0fd11338a4e00fd1d20acd2eaf133544321160606c908ca395911
+Deleted: sha256:b4ad020cdacfccfc4faf3dcd7984f600391d3972063112dd2b37dfbd30105993
+Deleted: sha256:6f226612ab7aafdd91fcc90917ad3d7a667237a78785fe2309faf160559a69a7
+Deleted: sha256:9671ab29815f09e9c2552b872e0097732d4b5efb5dfdc91630853d7bf7221f1a
+Deleted: sha256:7292cf786aa89399bca4e3edd105d3b2ee0683a46ef1f5ff436c0f9d1d49e765
+ubuntu@ip-172-31-31-3:~$
+
+
+############
+to run a ubuntu conatiner and get attached
+ubuntu@ip-172-31-31-3:~$ docker pull ubuntu
+Using default tag: latest
+latest: Pulling from library/ubuntu
+a48641193673: Pull complete
+Digest: sha256:6042500cf4b44023ea1894effe7890666b0c5c7871ed83a97c36c76ae560bb9b
+Status: Downloaded newer image for ubuntu:latest
+docker.io/library/ubuntu:latest
+ubuntu@ip-172-31-31-3:~$ docker run ubuntu
+ubuntu@ip-172-31-31-3:~$ docker ps -a
+CONTAINER ID   IMAGE         COMMAND       CREATED          STATUS                      PORTS     NAMES
+436b09de4c69   ubuntu        "/bin/bash"   5 seconds ago    Exited (0) 4 seconds ago              confident_thompson
+b69e8c145844   hello-world   "/hello"      39 minutes ago   Exited (0) 39 minutes ago             relaxed_meninsky
+ubuntu@ip-172-31-31-3:~$ docker run -it ubuntu /bin/bash
+
+
+###############DOCKER LOGS###########
+docker inspect imagename ####to inspect the images
+
+ubuntu@ip-172-31-31-3:~$ docker logs d737a9365017
+why we run container in detached mode -d because it is a long process and you dont want to see the processes you have to do ctrl c and it will kill the process
+
+
+#######RUN A SQL CONTAAIANER#######
+ubuntu@ip-172-31-31-3:~$ docker run -d -P mysql:5.7
+it will give a error
+ubuntu@ip-172-31-31-3:~$ docker logs d9a367b788a5
+2023-12-28 13:16:17+00:00 [Note] [Entrypoint]: Entrypoint script for MySQL Server 5.7.44-1.el7 started.
+2023-12-28 13:16:17+00:00 [Note] [Entrypoint]: Switching to dedicated user 'mysql'
+2023-12-28 13:16:17+00:00 [Note] [Entrypoint]: Entrypoint script for MySQL Server 5.7.44-1.el7 started.
+2023-12-28 13:16:17+00:00 [ERROR] [Entrypoint]: Database is uninitialized and password option is not specified
+    You need to specify one of the following as an environment variable:
+    - MYSQL_ROOT_PASSWORD
+    - MYSQL_ALLOW_EMPTY_PASSWORD
+    - MYSQL_RANDOM_ROOT_PASSWORD
+	
+	so you have to run  it by give pass a variable
+	ubuntu@ip-172-31-31-3:~$ docker run -d -P -e MYSQL_ROOT_PASSWORD=mypass mysql:5.7
+	
+	##########################Docker volumes#################
+	docker pull mysql:5.7
+	how to fnd the volumes directory
+	docker inspcet imagename
+	],
+            "Cmd": [
+                "mysqld"
+            ],
+            "ArgsEscaped": true,
+            "Image": "",
+            "Volumes": {
+                "/var/lib/mysql": {}
+ubuntu@ip-172-31-31-3:~$ ls
+ubuntu@ip-172-31-31-3:~$ mkdir vprodbdata            #######this will create a volume on your host machine 
+ubuntu@ip-172-31-31-3:~$ ls
+vprodbdata
+ubuntu@ip-172-31-31-3:~$ docker run --name vprodb -e MYSQL_ROOT_PASSWORD=secretpass -p 3030:3306 -v /home/ubuntu/vprodbdata/:/var/lib/mysql mysql:5.7
+see the content of the container
+ubuntu@ip-172-31-31-3:~$ docker exec -it vprodb /bin/bash
+bash-4.2# cd /var/lib/m
+misc/          mysql/         mysql-files/   mysql-keyring/
+bash-4.2# cd /var/lib/mysql
+bash-4.2# ls
+auto.cnf    ca.pem           client-key.pem  ib_logfile0  ibdata1  mysql       performance_schema  public_key.pem   server-key.pem
+ca-key.pem  client-cert.pem  ib_buffer_pool  ib_logfile1  ibtmp1   mysql.sock  private_key.pem     server-cert.pem  sys
+bash-4.2#
+Now even if you delete the container its material will be situated on host machine in volumes
+so how to create volumes
+docker volume ls
+docker volume create mydbdata
+ubuntu@ip-172-31-31-3:~$ docker run --name vprodb -d  -e MYSQL_ROOT_PASSWORD=secretpass -p 3030:3306 -v  mydbdata:/var/lib/mysql mysql:5.7
+6479107f559843d8f943277f8277ec14541cadccb453bf985d02118153186851
+you can see the data /var/lib/docker/volumes/mydbdata/_data
+docker inspect vprodb ###to details of container also
+ mysql -h 172.17.0.2 -u root -psecretpass   to access sqlclient
+ 
+ 
+ #################Build Docker images#############
+ mkdir images
+   65  cd images
+   66  ls
+   67  mkdir nano
+   68  wget https://www.tooplate.com/zip-templates/2122_nano_folio.zip
+   69  ls
+   70  unzip 2122_nano_folio.zip
+   71  sudo apt install unzip
+   72  ls
+   73  unzip 2122_nano_folio.zip
+   74  ls
+ubuntu@ip-172-31-31-3:~/images$ ls
+2122_nano_folio  2122_nano_folio.zip  nano
+ubuntu@ip-172-31-31-3:~/images$ cd 2122_nano_folio/
+ubuntu@ip-172-31-31-3:~/images/2122_nano_folio$ tar czvf nano.tar.gz *
+ubuntu@ip-172-31-31-3:~/images/2122_nano_folio$ ls
+css  fontawesome  img  index.html  js  nano.tar.gz
+ubuntu@ip-172-31-31-3:~/images/2122_nano_folio$ mv nano.tar.gz ../  ######## to move one level up
+ubuntu@ip-172-31-31-3:~/images/2122_nano_folio$ ls
+css  fontawesome  img  index.html  js
+ubuntu@ip-172-31-31-3:~/images/2122_nano_folio$
+ubuntu@ip-172-31-31-3:~/images$ ls
+2122_nano_folio  2122_nano_folio.zip  nano  nano.tar.gz
+
+#####How to write a docker file############
+FROM creates a layer from the ubuntu:22.04 Docker image.
+COPY adds files from your Docker client's current directory.
+RUN builds your application with make.
+CMD specifies what command to run within the container
+how to combine two commands use && b/n/
+#############DOCKERFILE###########
+ubuntu@ip-172-31-31-3:~/images/nano$ cat Dockerfile
+FROM ubuntu:latest
+LABEL "Author"="Rohit"
+LABEL "Project"="nano"
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt update && apt install git -y
+RUN apt install apache2 git -y
+CMD ["/usr/sbin/apache2ctl", "-D", "FOREGROUND"]
+EXPOSE 80
+WORKDIR /var/www/html
+VOLUME /var/log/apache2
+ADD nano.tar.gz /var/www/html
+#COPY nano.tar.gz /var/www/html
+
+#########################
+docker build -t nanoimg .    ##for current working directory .
+error in docker file
+we can add ENV DEBIAN_FRONTEND=noninteractive
+ubuntu@ip-172-31-31-3:~/images/nano$ docker build -t nanoimg .
+[+] Building 22.6s (10/10) FINISHED                                                                                                                                              docker:default
+ => [internal] load build definition from Dockerfile                                                                                                                                       0.0s
+ => => transferring dockerfile: 340B                                                                                                                                                       0.0s
+ => [internal] load .dockerignore                                                                                                                                                          0.0s
+ => => transferring context: 2B                                                                                                                                                            0.0s
+ => [internal] load metadata for docker.io/library/ubuntu:latest                                                                                                                           0.1s
+ => CACHED [1/5] FROM docker.io/library/ubuntu:latest@sha256:6042500cf4b44023ea1894effe7890666b0c5c7871ed83a97c36c76ae560bb9b                                                              0.0s
+ => [internal] load build context                                                                                                                                                          0.0s
+ => => transferring context: 35B                                                                                                                                                           0.0s
+ => [2/5] RUN apt update && apt install git -y                                                                                                                                            12.1s
+ => [3/5] RUN apt install apache2 git -y                                                                                                                                                   7.8s
+ => [4/5] WORKDIR /var/www/html                                                                                                                                                            0.1s
+ => [5/5] ADD nano.tar.gz /var/www/html                                                                                                                                                    0.2s
+ => exporting to image                                                                                                                                                                     2.1s
+ => => exporting layers                                                                                                                                                                    2.1s
+ => => writing image sha256:09caac033d11042152e8cb0b72e371b3d53b2441e29d742cb66294a21cbc5eb9                                                                                               0.0s
+ => => naming to docker.io/library/nanoimg                                                                                                                                                 0.0s
+ubuntu@ip-172-31-31-3:~/images/nano$ LS
+LS: command not found
+ubuntu@ip-172-31-31-3:~/images/nano$ ls
+Dockerfile  nano.tar.gz
+ubuntu@ip-172-31-31-3:~/images/nano$ docker images
+REPOSITORY   TAG       IMAGE ID       CREATED         SIZE
+nanoimg      latest    09caac033d11   3 minutes ago   263MB
+ubuntu@ip-172-31-31-3:~/images/nano$ docker run --name naowebsite -d -p 9080:80 nanoimg
+21e646f197faf1c79562bdcff92f84d6a0651f62ed5ab423954581ca7a4edede
+ubuntu@ip-172-31-31-3:~/images/nano$ docker ps -a
+CONTAINER ID   IMAGE     COMMAND                  CREATED          STATUS          PORTS                                   NAMES
+21e646f197fa   nanoimg   "/usr/sbin/apache2ct…"   14 seconds ago   Up 12 seconds   0.0.0.0:9080->80/tcp, :::9080->80/tcp   naowebsite
+ubuntu@ip-172-31-31-3:~/images/nano$
+creata re repository o docker hub
+push it 
+now docker build -t kubeimran/nanoimage:v2
+to logi into this image 
+docker login
+push the image into docker hub
+docker push kubeimran/nanoimage:v2
+ docker volume rm mydbdata  ###to delete a volume
