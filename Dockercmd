@@ -278,3 +278,13 @@ docker login
 push the image into docker hub
 docker push kubeimran/nanoimage:v2
  docker volume rm mydbdata  ###to delete a volume
+
+
+ YOu can use both entrypoint and cmd together
+ ENTRYPOINT ["echo"]
+ CMD ["hello"]
+
+ What is the purpose of using them together
+ that you can overwrite the argument
+ docker run conttainer name hi
+ it will print hi instaed of hello
