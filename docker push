@@ -1,0 +1,2 @@
+  docker tag ultimatecicd:v1 rohitchandel1998/ultimatecicd:v1            repo is ultimatecicd
+docker push rohitchandel1998/ultimatecicd:v1
